@@ -15,6 +15,9 @@ from borb.pdf.pdf import PDF
 
 
 def merge_pdfs():
+    """
+    Provide a UI around the borb PDF Library to merge PDFs together.
+    """
 
     rprint("\n[bold]Merge PDF Files[/bold]")
     rprint("Files will be merged in the order selected.")
@@ -73,6 +76,9 @@ def merge_pdfs():
 
 
 def quit_func():
+    """
+    Basic quit functionality.
+    """
 
     rprint("Goodbye!")
     sys.exit()
