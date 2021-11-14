@@ -2,12 +2,16 @@
 Intended to contain some basic PDF utilities
 """
 
+import sys
 from pathlib import Path
 
-from borb.pdf.pdf import PDF
-from borb.pdf.document import Document
+import rich
+import rich.prompt
+from rich import print as rprint
+from rich.pretty import pprint as rpprint
 
-import rich, rich.prompt
+from borb.pdf.document import Document
+from borb.pdf.pdf import PDF
 
 
 def merge_pdfs():
@@ -15,7 +19,9 @@ def merge_pdfs():
     files = []
 
     def get_file():
-        return Path(rich.prompt.Prompt.ask("\nWhat file do you want to open").strip('"'))
+        return Path(
+            rich.prompt.Prompt.ask("\nWhat file do you want to open").strip('"')
+        )
 
     def get_more():
         return rich.prompt.Confirm.ask("\nDo you want to add more files?")
@@ -31,9 +37,21 @@ def merge_pdfs():
 
         add_more = get_more()
 
+    rprint("\nAbout to combine the following files in order:")
+    rpprint(files)
+
+    cont = rich.prompt.Confirm.ask("\nDo you wish to continue?")
+
+    if not cont:
+        return
+
     pdfs = []
 
     for f in files:
+
+        if not f.exists():
+            raise FileNotFoundError(f"File {f} not found.")
+
         with open(f, "rb") as file_handle:
             pdfs.append(PDF.loads(file_handle))
 
@@ -45,20 +63,26 @@ def merge_pdfs():
     out_file = Path(rich.prompt.Prompt.ask("\nWhere do you want to save").strip())
 
     if out_file.exists():
-        raise FileExistsError()
+        raise FileExistsError(f"File {out_file} already exists. No overwrite.")
 
     with open(out_file, "wb") as file_handle:
         PDF.dumps(file_handle, out)
 
 
+def quit_func():
+
+    rprint("Goodbye!")
+    sys.exit()
+
+
 def main():
 
-    rich.print("Select from the options below:\n")
+    rprint("Select from the options below:\n")
 
-    option_dict = {1: ("Merge PDFs", merge_pdfs)}
+    option_dict = {1: ("Merge PDFs", merge_pdfs), 10: ("Quit", quit_func)}
 
     for o, v in option_dict.items():
-        rich.print(f"{o:03}: {v[0]}")
+        rprint(f"{o:03}: {v[0]}")
 
     while True:
         choice = rich.prompt.IntPrompt.ask("\nChoose which option you want to use")
@@ -66,7 +90,7 @@ def main():
         if choice in option_dict:
             break
         else:
-            rich.print(
+            rprint(
                 f"[red]Your choice ([italic]{choice}[/italic]) "
                 + "was not in the list of available choices[/red]"
             )
