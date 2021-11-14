@@ -16,6 +16,9 @@ from borb.pdf.pdf import PDF
 
 def merge_pdfs():
 
+    rprint("\n[bold]Merge PDF Files[/bold]")
+    rprint("Files will be merged in the order selected.")
+
     files = []
 
     def get_file():
@@ -81,21 +84,24 @@ def main():
 
     option_dict = {1: ("Merge PDFs", merge_pdfs), 10: ("Quit", quit_func)}
 
-    for o, v in option_dict.items():
-        rprint(f"{o:03}: {v[0]}")
-
     while True:
-        choice = rich.prompt.IntPrompt.ask("\nChoose which option you want to use")
+        while True:
 
-        if choice in option_dict:
-            break
-        else:
-            rprint(
-                f"[red]Your choice ([italic]{choice}[/italic]) "
-                + "was not in the list of available choices[/red]"
-            )
+            for o, v in option_dict.items():
+                rprint(f"{o:03}: {v[0]}")
 
-    option_dict[choice][1]()
+            choice = rich.prompt.IntPrompt.ask("\nChoose which option you want to use")
+
+            if choice in option_dict:
+                break
+            else:
+                rprint(
+                    f"[red]Your choice ([italic]{choice}[/italic]) "
+                    + "was not in the list of available choices[/red]\n"
+                )
+
+        option_dict[choice][1]()
+        rprint("\n")
 
 
 if __name__ == "__main__":
