@@ -32,13 +32,11 @@ def get_file(
 
     path = Path(path)
 
-    if not allow_exists:
-        if path.exists():
-            raise FileExistsError(f"Cannot use existing file {path}")
+    if not allow_exists and path.exists():
+        raise FileExistsError(f"Cannot use existing file {path}")
 
-    if not allow_missing:
-        if not path.exists():
-            raise FileNotFoundError(f"Could not find {path}")
+    if not allow_missing and not path.exists():
+        raise FileNotFoundError(f"Could not find {path}")
 
     return path
 
