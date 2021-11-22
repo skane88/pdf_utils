@@ -130,6 +130,11 @@ def rotate_page():
     overwrite = not rich.prompt.Confirm.ask("Do you want to save to a different file?")
 
     if overwrite:
+        if not rich.prompt.Confirm.ask(
+            "Existing file will be overwritten - do you want to continue?"
+        ):
+            return
+
         out_file = in_file
     else:
         out_file = get_file(
