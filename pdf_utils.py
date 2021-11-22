@@ -14,22 +14,31 @@ from borb.pdf.document import Document
 from borb.pdf.pdf import PDF
 
 
-def get_file() -> Path:
+def get_file(
+    prompt: str = "\nWhat file do you want to open",
+    allow_exists: bool = False,
+    allow_missing: bool = False,
+) -> Path:
     """
     Get a file path.
 
     :return:
     """
 
-    path = rich.prompt.Prompt.ask("\nWhat file do you want to open").strip('"')
+    path = rich.prompt.Prompt.ask(prompt).strip('"')
 
     if str(path) == "":
         raise ValueError(f"Expected a path to a file, received: {path}")
 
     path = Path(path)
 
-    if not path.exists():
-        raise FileNotFoundError(f"Could not find {path}")
+    if not allow_exists:
+        if path.exists():
+            raise FileExistsError(f"Cannot use existing file {path}")
+
+    if not allow_missing:
+        if not path.exists():
+            raise FileNotFoundError(f"Could not find {path}")
 
     return path
 
