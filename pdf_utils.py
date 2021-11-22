@@ -99,6 +99,49 @@ def merge_pdfs():
         PDF.dumps(file_handle, out)
 
 
+def rotate_page():
+    """
+    Provide a UI around the borb PDF library to rotate pages.
+    """
+
+    in_file = get_file(allow_exists=True)
+
+    page_no = rich.prompt.IntPrompt.ask(
+        "Which page do you wish to rotate", default=1, show_default=True
+    )
+
+    rot_amount = rich.prompt.Prompt.ask(
+        choices=["CW", "CCW", "180"], default="CW", show_default=True, show_choices=True
+    )
+
+    with open(in_file, "rb") as pdf_file:
+        pdf = PDF.loads(pdf_file)
+
+    # rotate the page
+
+    page_no = page_no - 1  # decrement page no. as borb uses 0 based indexing.
+
+    if rot_amount == "CW":
+        pdf.get_page(page_no).rotate_right()
+    elif rot_amount == "CCW":
+        pdf.get_page(page_no).rotate_left()
+    else:
+        pdf.get_page(page_no).rotate_left()
+        pdf.get_page(page_no).rotate_left()
+
+    overwrite = not rich.prompt.Confirm.ask("Do you want to save to a different file?")
+
+    if overwrite:
+        out_file = in_file
+    else:
+        out_file = get_file(
+            prompt="Where do you want to save the file?", allow_missing=True
+        )
+
+    with open(out_file, "wb") as pdf_file:
+        PDF.dumps(pdf_file, pdf)
+
+
 def quit_func():
     """
     Basic quit functionality.
@@ -112,7 +155,11 @@ def main():
 
     rprint("Select from the options below:\n")
 
-    option_dict = {1: ("Merge PDFs", merge_pdfs), 10: ("Quit", quit_func)}
+    option_dict = {
+        1: ("Merge PDFs", merge_pdfs),
+        2: ("Rotate Page", rotate_page),
+        10: ("Quit", quit_func),
+    }
 
     while True:
         while True:
