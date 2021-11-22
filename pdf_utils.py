@@ -14,6 +14,26 @@ from borb.pdf.document import Document
 from borb.pdf.pdf import PDF
 
 
+def get_file() -> Path:
+    """
+    Get a file path.
+
+    :return:
+    """
+
+    path = rich.prompt.Prompt.ask("\nWhat file do you want to open").strip('"')
+
+    if str(path) == "":
+        raise ValueError(f"Expected a path to a file, received: {path}")
+
+    path = Path(path)
+
+    if not path.exists():
+        raise FileNotFoundError(f"Could not find {path}")
+
+    return path
+
+
 def merge_pdfs():
     """
     Provide a UI around the borb PDF Library to merge PDFs together.
@@ -23,11 +43,6 @@ def merge_pdfs():
     rprint("Files will be merged in the order selected.")
 
     files = []
-
-    def get_file():
-        return Path(
-            rich.prompt.Prompt.ask("\nWhat file do you want to open").strip('"')
-        )
 
     def get_more():
         return rich.prompt.Confirm.ask("\nDo you want to add more files?")
