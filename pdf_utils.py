@@ -25,7 +25,7 @@ def get_file(
     :return:
     """
 
-    path = rich.prompt.Prompt.ask(prompt).strip('"')
+    path = rich.prompt.Prompt.ask(prompt).strip('"').strip("'")
 
     if str(path) == "":
         raise ValueError(f"Expected a path to a file, received: {path}")
@@ -54,14 +54,12 @@ def merge_pdfs():
     def get_more():
         return rich.prompt.Confirm.ask("\nDo you want to add more files?")
 
-    files.append(get_file())
-
-    add_more = get_more()
+    add_more = True
 
     while add_more:
 
         if add_more:
-            files.append(get_file())
+            files.append(get_file(allow_exists=True, allow_missing=False))
 
         add_more = get_more()
 
@@ -88,10 +86,9 @@ def merge_pdfs():
     for p in pdfs:
         out.append_document(p)
 
-    out_file = Path(rich.prompt.Prompt.ask("\nWhere do you want to save").strip())
-
-    if out_file.exists():
-        raise FileExistsError(f"File {out_file} already exists. No overwrite.")
+    out_file = get_file(
+        prompt="\nWhere do you want to save", allow_exists=False, allow_missing=True
+    )
 
     with open(out_file, "wb") as file_handle:
         PDF.dumps(file_handle, out)
