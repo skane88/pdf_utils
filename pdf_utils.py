@@ -5,6 +5,11 @@ Intended to contain some basic PDF utilities
 import sys
 from pathlib import Path
 
+import tkinter as tk
+import tkinter.filedialog as fd
+
+from typing import List
+
 import rich
 import rich.prompt
 from rich import print as rprint
@@ -14,31 +19,71 @@ from borb.pdf.document import Document
 from borb.pdf.pdf import PDF
 
 
-def get_file(
+def get_files(
     prompt: str = "\nWhat file do you want to open",
+    open_dialog: bool = True,
+    multiple: bool = True,
     allow_exists: bool = False,
     allow_missing: bool = False,
-) -> Path:
+) -> List[Path]:
     """
     Get a file path.
 
     :return:
     """
 
-    path = rich.prompt.Prompt.ask(prompt).strip('"').strip("'")
+    rprint(prompt)
 
-    if str(path) == "":
-        raise ValueError(f"Expected a path to a file, received: {path}")
+    root = tk.Tk()
+    root.withdraw()
 
-    path = Path(path)
+    if open_dialog:
+        if multiple:
+            files = fd.askopenfilenames(
+                parent=root,
+                title="Choose Files",
+                filetypes=[("PDF Files", "*.pdf")],
+            )
+        else:
+            files = [
+                fd.askopenfilename(
+                    parent=root,
+                    title="Choose File",
+                    filetypes=[("PDF Files", "*.pdf")],
+                )
+            ]
+    else:
+        files = [
+            fd.asksaveasfilename(
+                parent=root, title="Choose File", filetypes=[("PDF Files", "*.pdf")]
+            )
+        ]
 
-    if not allow_exists and path.exists():
-        raise FileExistsError(f"Cannot use existing file {path}")
+    root.destroy()
 
-    if not allow_missing and not path.exists():
-        raise FileNotFoundError(f"Could not find {path}")
+    ret_files = []
 
-    return path
+    for f in files:
+
+        path = f.strip('"').strip("'")
+
+        if path[-4:] != ".pdf":
+            path += ".pdf"
+
+        if str(path) == "":
+            raise ValueError(f"Expected a path to a file, received: {path}")
+
+        path = Path(path)
+
+        if not allow_exists and path.exists():
+            raise FileExistsError(f"Cannot use existing file {path}")
+
+        if not allow_missing and not path.exists():
+            raise FileNotFoundError(f"Could not find {path}")
+
+        ret_files.append(path)
+
+    return ret_files
 
 
 def merge_pdfs():
@@ -59,7 +104,7 @@ def merge_pdfs():
     while add_more:
 
         if add_more:
-            files.append(get_file(allow_exists=True, allow_missing=False))
+            files += get_files(allow_exists=True, allow_missing=False)
 
         add_more = get_more()
 
@@ -86,9 +131,12 @@ def merge_pdfs():
     for p in pdfs:
         out.append_document(p)
 
-    out_file = get_file(
-        prompt="\nWhere do you want to save", allow_exists=False, allow_missing=True
-    )
+    out_file = get_files(
+        prompt="\nWhere do you want to save",
+        open_dialog=False,
+        allow_exists=False,
+        allow_missing=True,
+    )[0]
 
     with open(out_file, "wb") as file_handle:
         PDF.dumps(file_handle, out)
@@ -99,7 +147,7 @@ def rotate_page():
     Provide a UI around the borb PDF library to rotate pages.
     """
 
-    in_file = get_file(allow_exists=True)
+    in_file = get_files(allow_exists=True)
 
     page_no = rich.prompt.IntPrompt.ask(
         "Which page do you wish to rotate", default=1, show_default=True
@@ -134,7 +182,7 @@ def rotate_page():
 
         out_file = in_file
     else:
-        out_file = get_file(
+        out_file = get_files(
             prompt="Where do you want to save the file?", allow_missing=True
         )
 
