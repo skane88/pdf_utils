@@ -18,6 +18,8 @@ from rich.pretty import pprint as rpprint
 from borb.pdf.document import Document
 from borb.pdf.pdf import PDF
 
+PDF_EXT = ".pdf"
+
 
 def get_files(
     prompt: str = "\nWhat file do you want to open",
@@ -37,25 +39,27 @@ def get_files(
     root = tk.Tk()
     root.withdraw()
 
+    FILE_TYPE = "PDF Files"
+
     if open_dialog:
         if multiple:
             files = fd.askopenfilenames(
                 parent=root,
                 title="Choose Files",
-                filetypes=[("PDF Files", "*.pdf")],
+                filetypes=[(FILE_TYPE, "*" + PDF_EXT)],
             )
         else:
             files = [
                 fd.askopenfilename(
                     parent=root,
                     title="Choose File",
-                    filetypes=[("PDF Files", "*.pdf")],
+                    filetypes=[(FILE_TYPE, "*" + PDF_EXT)],
                 )
             ]
     else:
         files = [
             fd.asksaveasfilename(
-                parent=root, title="Choose File", filetypes=[("PDF Files", "*.pdf")]
+                parent=root, title="Choose File", filetypes=[(FILE_TYPE, "*" + PDF_EXT)]
             )
         ]
 
@@ -67,8 +71,8 @@ def get_files(
 
         path = f.strip('"').strip("'")
 
-        if path[-4:] != ".pdf":
-            path += ".pdf"
+        if path[-4:] != PDF_EXT:
+            path += PDF_EXT
 
         if str(path) == "":
             raise ValueError(f"Expected a path to a file, received: {path}")
