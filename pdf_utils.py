@@ -63,7 +63,7 @@ def merge_pdfs():
 
         add_more = get_more()
 
-    rprint("\nAbout to combine the following files in order:")
+    rprint("\nAbout to combine the following files in the listed order:")
     rpprint(files)
 
     cont = rich.prompt.Confirm.ask("\nDo you wish to continue?")
