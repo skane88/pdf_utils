@@ -71,13 +71,13 @@ def get_files(
 
         path = f.strip('"').strip("'")
 
-        if path[-4:] != PDF_EXT:
-            path += PDF_EXT
-
         if str(path) == "":
             raise ValueError(f"Expected a path to a file, received: {path}")
 
         path = Path(path)
+
+        if path.suffix.lower() != PDF_EXT:
+            path = path.with_suffix(PDF_EXT)
 
         if not allow_exists and path.exists():
             raise FileExistsError(f"Cannot use existing file {path}")
