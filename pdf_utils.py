@@ -151,7 +151,7 @@ def rotate_page():
     Provide a UI around the borb PDF library to rotate pages.
     """
 
-    in_file = get_files(allow_exists=True)
+    in_file = get_files(allow_exists=True)[0]
 
     page_no = rich.prompt.IntPrompt.ask(
         "Which page do you wish to rotate", default=1, show_default=True
