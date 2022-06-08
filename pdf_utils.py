@@ -43,20 +43,22 @@ def get_files(
             files = fd.askopenfilenames(
                 parent=root,
                 title="Choose Files",
-                filetypes=[(FILE_TYPE, "*" + PDF_EXT)],
+                filetypes=[(FILE_TYPE, f"*{PDF_EXT}")],
             )
+
         else:
             files = [
                 fd.askopenfilename(
                     parent=root,
                     title="Choose File",
-                    filetypes=[(FILE_TYPE, "*" + PDF_EXT)],
+                    filetypes=[(FILE_TYPE, f"*{PDF_EXT}")],
                 )
             ]
+
     else:
         files = [
             fd.asksaveasfilename(
-                parent=root, title="Choose File", filetypes=[(FILE_TYPE, "*" + PDF_EXT)]
+                parent=root, title="Choose File", filetypes=[(FILE_TYPE, f"*{PDF_EXT}")]
             )
         ]
 
@@ -68,7 +70,7 @@ def get_files(
 
         path = f.strip('"').strip("'")
 
-        if str(path) == "":
+        if not str(path):
             raise ValueError(f"Expected a path to a file, received: {path}")
 
         path = Path(path)
