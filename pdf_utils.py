@@ -3,20 +3,17 @@ Intended to contain some basic PDF utilities
 """
 
 import sys
-from pathlib import Path
-
 import tkinter as tk
 import tkinter.filedialog as fd
-
+from pathlib import Path
 from typing import List
 
 import rich
 import rich.prompt
-from rich import print as rprint
-from rich.pretty import pprint as rpprint
-
 from borb.pdf.document import Document
 from borb.pdf.pdf import PDF
+from rich import print as rprint
+from rich.pretty import pprint as rpprint
 
 PDF_EXT = ".pdf"
 
